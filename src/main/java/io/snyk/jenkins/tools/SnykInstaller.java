@@ -103,7 +103,7 @@ public class SnykInstaller extends ToolInstaller {
     }
   }
 
-  private FilePath installSnykAsNpmPackage(FilePath expected, Node node, TaskListener log) {
+  private FilePath installSnykAsNpmPackage(FilePath expected, Node node, TaskListener log) throws ToolDetectionException {
     LOG.info("Install Snyk version '{}' as NPM package on node '{}'", version, node.getDisplayName());
 
     ArgumentListBuilder args = new ArgumentListBuilder();
@@ -122,11 +122,12 @@ public class SnykInstaller extends ToolInstaller {
     } catch (Exception ex) {
       log.getLogger().println("Snyk Security tool could not installed: " + ex.getMessage());
       LOG.error("Could not install Snyk as NPM package", ex);
+      throw new ToolDetectionException("Could not install Snyk CLI with npm", ex);
     }
     return expected;
   }
 
-  private FilePath installSnykAsSingleBinary(FilePath expected, Node node, TaskListener log) throws IOException, InterruptedException {
+  private FilePath installSnykAsSingleBinary(FilePath expected, Node node, TaskListener log) throws IOException, InterruptedException, ToolDetectionException {
     LOG.info("Install Snyk version '{}' as single binary on node '{}'", version, node.getDisplayName());
 
     final VirtualChannel nodeChannel = node.getChannel();
@@ -147,6 +148,7 @@ public class SnykInstaller extends ToolInstaller {
     } catch (Exception ex) {
       log.getLogger().println("Snyk Security tool could not installed: " + ex.getMessage());
       LOG.error("Could not install Snyk as single binary", ex);
+      throw new ToolDetectionException("Could not install Snyk CLI from binary", ex);
     }
 
     return expected;
